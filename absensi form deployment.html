@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Laporan Absensi</title>
+    <!-- 1. Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Style tambahan untuk tampilan yang lebih baik */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .form-section {
+            @apply bg-white p-6 rounded-lg shadow-md mb-6;
+        }
+        .form-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .form-input, .form-textarea, .form-select {
+            @apply w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500;
+        }
+        .form-button {
+            @apply w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-150 disabled:opacity-50 disabled:cursor-wait;
+        }
+        h2 { @apply text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4; }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white p-6 rounded-lg shadow-xl mb-6 text-center">
+            <h1 class="text-3xl font-bold text-gray-900">LAPORAN ABSENSI HARIAN</h1>
+            <p class="text-gray-600">DAILY ATTENDANCE REPORT</p>
+        </div>
+
+        <!-- 2. Ini adalah formulir yang akan diisi -->
+        <form id="reportForm" class="space-y-6">
+
+            <!-- BAGIAN 1: INFORMASI KARYAWAN -->
+            <div class="form-section">
+                <h2>BAGIAN 1: INFORMASI KARYAWAN / SECTION 1: EMPLOYEE INFORMATION</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="tanggal" class="form-label">Tanggal / Date</label>
+                        <input type="date" id="tanggal" class="form-input" required>
+                    </div>
+                    <div>
+                        <label for="namaKaryawan" class="form-label">Nama Karyawan / Employee Name</label>
+                        <input type="text" id="namaKaryawan" class="form-input" placeholder="Nama lengkap karyawan" required>
+                    </div>
+                    <div>
+                        <label for="posisi" class="form-label">Posisi</label>
+                        <input type="text" id="posisi" class="form-input" placeholder="Contoh: PHL atau Karyawan" required>
+                    </div>
+                    <div>
+                        <label for="lokasiKerja" class="form-label">Lokasi Kerja / Korwil</label>
+                        <input type="text" id="lokasiKerja" class="form-input" placeholder="Contoh: Situs Monggak / Korwil Batam" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BAGIAN 2: STATUS KEHADIRAN -->
+            <div class="form-section">
+                <h2>BAGIAN 2: STATUS KEHADIRAN / SECTION 2: ATTENDANCE STATUS</h2>
+                <div class="space-y-4">
+                    <div>
+                        <label for="statusKehadiran" class="form-label">Status Hari Ini / Today's Status</label>
+                        <select id="statusKehadiran" class="form-select" required>
+                            <option value="">-- Pilih Status --</option>
+                            <option value="Hadir (Present)">Hadir (Present)</option>
+                            <option value="Sakit (Sick)">Sakit (Sick)</option>
+                            <option value="Izin (Permission)">Izin (Permission)</option>
+                            <option value="Cuti (Leave)">Cuti (Leave)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="keterangan" class="form-label">Catatan / Keterangan</label>
+                        <textarea id="keterangan" rows="3" class="form-textarea" placeholder="Contoh: Hadir di lokasi site. / Sakit demam, surat dokter terlampir. / Izin urusan keluarga." required></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BAGIAN 3: BUKTI PENDUKUNG -->
+            <div class="form-section">
+                <h2>BAGIAN 3: BUKTI PENDUKUNG / SECTION 3: SUPPORTING EVIDENCE</h2>
+                <div>
+                    <label for="photoUpload" class="form-label">Upload Bukti (Foto di Lokasi / Surat Dokter / Surat Izin)</label>
+                    <input type="file" id="photoUpload" class="w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-blue-50 file:text-blue-700
+                        hover:file:bg-blue-100"
+                        accept="image/jpeg, image/png" multiple>
+                    <p class="text-xs text-gray-500 mt-2">*Disarankan diisi jika status BUKAN 'Hadir'.</p>
+                </div>
+            </div>
+
+            <!-- Tombol Submit -->
+            <div class="mt-6">
+                <!-- PERUBAHAN: Teks tombol diubah -->
+                <button type="submit" class="form-button">
+                    Kirim Laporan ke Google Drive
+                </button>
+            </div>
+
+            <!-- Status Message -->
+            <div id="status" class="text-center text-green-600 font-medium mt-4"></div>
+
+        </form>
+    </div>
+
+    <!-- 3. Ini adalah JavaScript yang melakukan semua "keajaiban" -->
+    <script>
+        // !!!!! PENTING: GANTI URL DI BAWAH INI !!!!!
+        // Ganti dengan URL Web App dari Google Apps Script Anda (dari Bagian 1, Langkah 4)
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzjA65RoXoYA7hmcJhJDbuIKowyyoun6cf0tlgqhrEQE4NQ1yFUrtfqGYSwkFtNieNV/exec';
+        // !!!!! PENTING: GANTI URL DI ATAS INI !!!!!
+
+
+        const reportForm = document.getElementById('reportForm');
+        const statusDiv = document.getElementById('status');
+        const tanggalInput = document.getElementById('tanggal');
+        const formButton = reportForm.querySelector('button');
+
+        // Otomatis isi tanggal hari ini
+        tanggalInput.value = new Date().toISOString().split('T')[0];
+
+        // --- FUNGSI SUBMIT BARU ---
+        reportForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Mencegah form submit standar
+            
+            if (WEB_APP_URL === 'GANTI_DENGAN_URL_WEB_APP_ANDA') {
+                statusDiv.textContent = 'Error: WEB_APP_URL belum diatur di file HTML.';
+                statusDiv.className = 'text-center text-red-600 font-medium mt-4';
+                return;
+            }
+            
+            statusDiv.textContent = 'Mengirim laporan, mohon tunggu...';
+            statusDiv.className = 'text-center text-yellow-600 font-medium mt-4';
+            formButton.disabled = true;
+
+            try {
+                // --- Ambil Data Teks ---
+                const formData = {
+                    tanggal: document.getElementById('tanggal').value,
+                    namaKaryawan: document.getElementById('namaKaryawan').value,
+                    posisi: document.getElementById('posisi').value,
+                    lokasiKerja: document.getElementById('lokasiKerja').value,
+                    statusKehadiran: document.getElementById('statusKehadiran').value,
+                    keterangan: document.getElementById('keterangan').value,
+                };
+
+                // --- Ambil Data Foto ---
+                const photoFiles = document.getElementById('photoUpload').files;
+                const photoDataUrls = await readFilesAsDataUrls(photoFiles);
+
+                // --- Siapkan Payload untuk dikirim ---
+                const payload = {
+                    formData: formData,
+                    photoDataUrls: photoDataUrls
+                };
+
+                // --- Kirim data ke Google Apps Script ---
+                const response = await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json(); // Menunggu balasan JSON dari skrip
+
+                if (result.status === 'success') {
+                    statusDiv.textContent = 'Laporan berhasil terkirim dan disimpan ke Google Drive!';
+                    statusDiv.className = 'text-center text-green-600 font-medium mt-4';
+                    reportForm.reset(); // Kosongkan form
+                    tanggalInput.value = new Date().toISOString().split('T')[0]; // Isi tanggal lagi
+                } else {
+                    // Tampilkan error jika skrip mengembalikan 'error'
+                    throw new Error(result.message || 'Server mengembalikan error.');
+                }
+
+            } catch (error) {
+                console.error('Gagal mengirim laporan:', error);
+                statusDiv.textContent = 'Error: Gagal mengirim laporan. Periksa koneksi internet Anda atau hubungi admin.';
+                statusDiv.className = 'text-center text-red-600 font-medium mt-4';
+            } finally {
+                // Selalu aktifkan kembali tombolnya
+                formButton.disabled = false;
+            }
+        });
+
+        // Fungsi untuk membaca file foto sebagai Base64 (Tidak berubah)
+        function readFilesAsDataUrls(files) {
+            return Promise.all(Array.from(files).map(file => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }));
+        }
+
+        // Fungsi generateReportHTML (Tidak berubah) sudah dihapus dari sini
+        // karena sekarang dieksekusi di sisi server (Code.gs)
+    </script>
+</body>
+</html>
