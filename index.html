@@ -4,25 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generator Laporan Absensi</title>
-    <!-- 1. Memuat Tailwind CSS untuk styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Style tambahan untuk tampilan yang lebih baik */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .form-section {
-            @apply bg-white p-6 rounded-lg shadow-md mb-6;
-        }
-        .form-label {
-            @apply block text-sm font-medium text-gray-700 mb-1;
-        }
-        .form-input, .form-textarea, .form-select {
-            @apply w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500;
-        }
-        .form-button {
-            @apply w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-150 disabled:opacity-50 disabled:cursor-wait;
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .form-section { @apply bg-white p-6 rounded-lg shadow-md mb-6; }
+        .form-label { @apply block text-sm font-medium text-gray-700 mb-1; }
+        .form-input, .form-textarea, .form-select { @apply w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500; }
+        .form-button { @apply w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-150 disabled:opacity-50 disabled:cursor-wait; }
         h2 { @apply text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4; }
     </style>
 </head>
@@ -34,10 +22,8 @@
             <p class="text-gray-600">DAILY ATTENDANCE REPORT</p>
         </div>
 
-        <!-- 2. Ini adalah formulir yang akan diisi -->
         <form id="reportForm" class="space-y-6">
-
-            <!-- BAGIAN 1: INFORMASI KARYAWAN -->
+            <!-- BAGIAN 1 -->
             <div class="form-section">
                 <h2>BAGIAN 1: INFORMASI KARYAWAN / SECTION 1: EMPLOYEE INFORMATION</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,7 +46,7 @@
                 </div>
             </div>
 
-            <!-- BAGIAN 2: STATUS KEHADIRAN -->
+            <!-- BAGIAN 2 -->
             <div class="form-section">
                 <h2>BAGIAN 2: STATUS KEHADIRAN / SECTION 2: ATTENDANCE STATUS</h2>
                 <div class="space-y-4">
@@ -81,7 +67,7 @@
                 </div>
             </div>
 
-            <!-- BAGIAN 3: BUKTI PENDUKUNG -->
+            <!-- BAGIAN 3 -->
             <div class="form-section">
                 <h2>BAGIAN 3: BUKTI PENDUKUNG / SECTION 3: SUPPORTING EVIDENCE</h2>
                 <div>
@@ -97,50 +83,34 @@
                 </div>
             </div>
 
-            <!-- Tombol Submit -->
             <div class="mt-6">
-                <button type="submit" class="form-button">
-                    Kirim Laporan ke Google Drive
-                </button>
+                <button type="submit" class="form-button">Kirim Laporan ke Google Drive</button>
             </div>
-
-            <!-- Status Message -->
             <div id="status" class="text-center text-green-600 font-medium mt-4"></div>
-
         </form>
     </div>
 
-    <!-- 3. Ini adalah JavaScript yang melakukan semua "keajaiban" -->
     <script>
-        // !!!!! INI SUDAH SAYA PERBARUI DENGAN URL BARU ANDA !!!!!
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzjA65RoXoYA7hmcJhJDbuIKowyyoun6cf0tlgqhrEQE4NQ1yFUrtfqGYSwkFtNieNV/exec';
-        // !!!!! INI SUDAH SAYA PERBARUI DENGAN URL BARU ANDA !!!!!
-
+        // --- CONFIGURATION ---
+        // YOUR URL IS ALREADY INSERTED BELOW:
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyY-XW3oZnG5auJi5LdgxRwikTIT5P2wMgOo1VJ6DvoQg1d3yAxNO-ZS89GRfWj-i-Vww/exec'; 
+        // ---------------------
 
         const reportForm = document.getElementById('reportForm');
         const statusDiv = document.getElementById('status');
         const tanggalInput = document.getElementById('tanggal');
         const formButton = reportForm.querySelector('button');
 
-        // Otomatis isi tanggal hari ini
         tanggalInput.value = new Date().toISOString().split('T')[0];
 
-        // --- FUNGSI SUBMIT BARU ---
         reportForm.addEventListener('submit', async function(event) {
-            event.preventDefault(); // Mencegah form submit standar
-            
-            if (WEB_APP_URL.includes('GANTI_DENGAN_URL')) { // Pengecekan placeholder
-                statusDiv.textContent = 'Error: WEB_APP_URL belum diatur di file HTML.';
-                statusDiv.className = 'text-center text-red-600 font-medium mt-4';
-                return;
-            }
+            event.preventDefault();
             
             statusDiv.textContent = 'Mengirim laporan, mohon tunggu...';
             statusDiv.className = 'text-center text-yellow-600 font-medium mt-4';
             formButton.disabled = true;
 
             try {
-                // --- Ambil Data Teks ---
                 const formData = {
                     tanggal: document.getElementById('tanggal').value,
                     namaKaryawan: document.getElementById('namaKaryawan').value,
@@ -150,46 +120,37 @@
                     keterangan: document.getElementById('keterangan').value,
                 };
 
-                // --- Ambil Data Foto ---
                 const photoFiles = document.getElementById('photoUpload').files;
                 const photoDataUrls = await readFilesAsDataUrls(photoFiles);
 
-                // --- Siapkan Payload untuk dikirim ---
-                const payload = {
-                    formData: formData,
-                    photoDataUrls: photoDataUrls
-                };
+                const payload = { formData: formData, photoDataUrls: photoDataUrls };
 
-                // --- Kirim data ke Google Apps Script ---
                 const response = await fetch(WEB_APP_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload),
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
                 });
 
-                const result = await response.json(); // Menunggu balasan JSON dari skrip
+                const result = await response.json();
 
                 if (result.status === 'success') {
                     statusDiv.textContent = 'Laporan berhasil terkirim dan disimpan ke Google Drive!';
                     statusDiv.className = 'text-center text-green-600 font-medium mt-4';
-                    reportForm.reset(); // Kosongkan form
-                    tanggalInput.value = new Date().toISOString().split('T')[0]; // Isi tanggal lagi
+                    reportForm.reset();
+                    tanggalInput.value = new Date().toISOString().split('T')[0];
                 } else {
-                    // Tampilkan error jika skrip mengembalikan 'error'
                     throw new Error(result.message || 'Server mengembalikan error.');
                 }
 
             } catch (error) {
                 console.error('Gagal mengirim laporan:', error);
-                statusDiv.textContent = 'Error: Gagal mengirim laporan. Periksa koneksi internet Anda atau hubungi admin.';
+                statusDiv.textContent = 'Error: Gagal mengirim laporan. ' + error.message;
                 statusDiv.className = 'text-center text-red-600 font-medium mt-4';
             } finally {
-                // Selalu aktifkan kembali tombolnya
                 formButton.disabled = false;
             }
         });
 
-        // Fungsi untuk membaca file foto sebagai Base64 (Tidak berubah)
         function readFilesAsDataUrls(files) {
             return Promise.all(Array.from(files).map(file => {
                 return new Promise((resolve, reject) => {
