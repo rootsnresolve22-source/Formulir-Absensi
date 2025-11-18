@@ -99,7 +99,6 @@
 
             <!-- Tombol Submit -->
             <div class="mt-6">
-                <!-- PERUBAHAN: Teks tombol diubah -->
                 <button type="submit" class="form-button">
                     Kirim Laporan ke Google Drive
                 </button>
@@ -113,10 +112,9 @@
 
     <!-- 3. Ini adalah JavaScript yang melakukan semua "keajaiban" -->
     <script>
-        // !!!!! PENTING: GANTI URL DI BAWAH INI !!!!!
-        // Ganti dengan URL Web App dari Google Apps Script Anda (dari Bagian 1, Langkah 4)
+        // !!!!! INI SUDAH SAYA PERBARUI DENGAN URL BARU ANDA !!!!!
         const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzjA65RoXoYA7hmcJhJDbuIKowyyoun6cf0tlgqhrEQE4NQ1yFUrtfqGYSwkFtNieNV/exec';
-        // !!!!! PENTING: GANTI URL DI ATAS INI !!!!!
+        // !!!!! INI SUDAH SAYA PERBARUI DENGAN URL BARU ANDA !!!!!
 
 
         const reportForm = document.getElementById('reportForm');
@@ -131,7 +129,7 @@
         reportForm.addEventListener('submit', async function(event) {
             event.preventDefault(); // Mencegah form submit standar
             
-            if (WEB_APP_URL === 'GANTI_DENGAN_URL_WEB_APP_ANDA') {
+            if (WEB_APP_URL.includes('GANTI_DENGAN_URL')) { // Pengecekan placeholder
                 statusDiv.textContent = 'Error: WEB_APP_URL belum diatur di file HTML.';
                 statusDiv.className = 'text-center text-red-600 font-medium mt-4';
                 return;
@@ -202,9 +200,6 @@
                 });
             }));
         }
-
-        // Fungsi generateReportHTML (Tidak berubah) sudah dihapus dari sini
-        // karena sekarang dieksekusi di sisi server (Code.gs)
     </script>
 </body>
 </html>
